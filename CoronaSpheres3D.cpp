@@ -49,7 +49,7 @@ void hacerfoto(){
   	point[0] = norm[0];
     point[1] = norm[1];
     point[2] = norm[2];
-    if (estamosalineados()!= true){
+    if (estamosalineados()!= true){          //Aqui deberia ir un while
         Movimiento();
         api.setAttitudeTarget(point);
     }
