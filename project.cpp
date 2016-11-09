@@ -10,8 +10,9 @@
 //  Revision:    10/11/14                                                                             //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define MAX_MEMORY 2
+#define PI 3,1415
 
-#define pi 3,1415
 
 float forces[3];
 float torques[3];
@@ -27,7 +28,7 @@ int counter;
 float norm[3];
 float posicionSatelite[12];
 
-bool estamosalineados(){
+bool isAligned(){
     api.getMyZRState(posicionSatelite);
     game.getPOILoc(posicionPOI, PoiID);
     float dir[3];
@@ -35,21 +36,20 @@ bool estamosalineados(){
     mathVecNormalize(dir,3);
     float dotProd;
     dotProd = mathVecInner(dir,&posicionSatelite[6],3);
-    if(dotProd>.985)
-    {
+    if(dotProd>.985){
        return true;
     }
     else{
        return false;
     }
 }
-void hacerfoto(){
+void makePicture(){
   	float point[3];
   	calcularattitude();
   	point[0] = norm[0];
     point[1] = norm[1];
     point[2] = norm[2];
-    if (estamosalineados()!= true){          //Aqui deberia ir un while
+    while (!(isAligned())){
         Movimiento();
         api.setAttitudeTarget(point);
     }
@@ -67,7 +67,7 @@ void calcularattitude(){
 }
 
 void vaciar(){
-    if (game.getMemoryFilled() == 2){
+    if (game.getMemoryFilled() == MAX_MEMORY){
         DEBUG(("La memoria esta llena, procediendo a la subida de fotos.\n"));
         game.uploadPic();
         DEBUG(("Fotos subidas, espere 3 segundos para tener la camara operativa. \n"));
@@ -250,28 +250,28 @@ void PosicionFinalCartesianasAEsfericas(){
         posicionFinalEsferica[1] = atanf(sqrtf(posicionPOI[0]*posicionPOI[0]+posicionPOI[1]*posicionPOI[1])/posicionPOI[2]);
     }
     else if(posicionPOI[2]==0){
-        posicionFinalEsferica[1] = (pi/2);
+        posicionFinalEsferica[1] = (PI/2);
     }
     else if(posicionPOI[2]<0){
-        posicionFinalEsferica[1] = pi+atanf(sqrtf(posicionPOI[0]*posicionPOI[0]+posicionPOI[1]*posicionPOI[1])/posicionPOI[2]);
+        posicionFinalEsferica[1] = PI+atanf(sqrtf(posicionPOI[0]*posicionPOI[0]+posicionPOI[1]*posicionPOI[1])/posicionPOI[2]);
     }
     //pasar z a fi
     if(posicionPOI[0]>0 && posicionPOI[1]>0){
         posicionFinalEsferica[2] = atanf(posicionPOI[1]/posicionPOI[0]);
     }
     else if(posicionPOI[0]>0 && posicionPOI[1]<0){
-        posicionFinalEsferica[2] = 2*pi+atanf(posicionPOI[1]/posicionPOI[0]);    
+        posicionFinalEsferica[2] = 2*PI+atanf(posicionPOI[1]/posicionPOI[0]);    
     }
     else if(posicionPOI[0]==0){
         if(posicionPOI[1]<0){
-            posicionFinalEsferica[2] = (pi*0.5)*1;
+            posicionFinalEsferica[2] = (PI*0.5)*1;
         }
         else if(posicionPOI[1]<0){
-            posicionFinalEsferica[2] = (pi*0.5)*-1;
+            posicionFinalEsferica[2] = (PI*0.5)*-1;
         }
     }
     else if(posicionPOI[0]<0){
-        posicionFinalEsferica[2] = pi+atanf(posicionPOI[1]/posicionPOI[0]);
+        posicionFinalEsferica[2] = PI+atanf(posicionPOI[1]/posicionPOI[0]);
     }
     //ahora la posicion del poi esta en esfericas
     // el siguiente paso es sumarle al radio lo que le falta para estar en la zona outer
@@ -299,28 +299,28 @@ void PosicionInicialCartesianasAEsfericas(){
         posicionInicialEsferica[1] = atanf(sqrtf(posicionInicial[0]*posicionInicial[0]+posicionInicial[1]*posicionInicial[1])/posicionInicial[2]);
     }
     else if(posicionInicial[2]==0){
-        posicionInicialEsferica[1] = pi/2;
+        posicionInicialEsferica[1] = PI/2;
     }
     else if(posicionInicial[2]<0){
-        posicionInicialEsferica[1] = pi+atanf(sqrtf(posicionInicial[0]*posicionInicial[0]+posicionInicial[1]*posicionInicial[1])/posicionInicial[2]);
+        posicionInicialEsferica[1] = PI+atanf(sqrtf(posicionInicial[0]*posicionInicial[0]+posicionInicial[1]*posicionInicial[1])/posicionInicial[2]);
     }
     //pasar z
     if(posicionInicial[0]>0 && posicionInicial[1]>0){
         posicionInicialEsferica[2] = atanf(posicionInicial[1]/posicionInicial[0]);
     }
     else if(posicionInicial[0]>0 && posicionInicial[1]<0){
-        posicionInicialEsferica[2] = 2*pi+atanf(posicionInicial[1]/posicionInicial[0]);    
+        posicionInicialEsferica[2] = 2*PI+atanf(posicionInicial[1]/posicionInicial[0]);    
     }
     else if(posicionInicial[0]==0){
         if(posicionInicial[1]<0){
-            posicionInicialEsferica[2] = (pi*0.5)*1;
+            posicionInicialEsferica[2] = (PI*0.5)*1;
         }
         else if(posicionInicial[1]<0){
-            posicionInicialEsferica[2] = (pi*0.5)*-1;
+            posicionInicialEsferica[2] = (PI*0.5)*-1;
         }
     }
     else if(posicionInicial[0]<0){
-        posicionInicialEsferica[2] = pi+atanf(posicionInicial[1]/posicionInicial[0]);
+        posicionInicialEsferica[2] = PI+atanf(posicionInicial[1]/posicionInicial[0]);
     }
     DEBUG(("La posicion inicial esferica es: %f ,%f ,%f \n", posicionInicialEsferica[0], posicionInicialEsferica[1], posicionInicialEsferica[2]));
     return;
@@ -330,42 +330,15 @@ void PosicionInicialCartesianasAEsfericas(){
 void init(){
     counter = 0;
     PoiID = 0;
-    vector[0] = 0;
-    vector[1] = 0;
-    vector[2] = 0;
-    posicionInicial[0] = 0;
-    posicionInicial[1] = 0;    
-    posicionInicial[2] = 0;    
-    posicionInicial[3] = 0;    
-    posicionInicial[4] = 0;    
-    posicionInicial[5] = 0;    
-    posicionInicial[6] = 0;    
-    posicionInicial[7] = 0;
-    posicionInicial[8] = 0;    
-    posicionInicial[9] = 0;    
-    posicionInicial[10] = 0;    
-    posicionInicial[11] = 0;
-    posicionInicialEsferica[0] = 0;
-    posicionInicialEsferica[1] = 0;    
-    posicionInicialEsferica[2] = 0;
-    posicionInicialCartesiana[0] = 0;
-    posicionInicialCartesiana[1] = 0;    
-    posicionInicialCartesiana[2] = 0; 
-    posicionPOI[0] = 0;
-    posicionPOI[1] = 0;
-    posicionPOI[2] = 0;
-    posicionFinalEsferica[0] = 0;
-    posicionFinalEsferica[1] = 0;
-    posicionFinalEsferica[2] = 0;
-    posicionFinal[0] = 0;   
-    posicionFinal[1] = 0;   
-    posicionFinal[2] = 0;   
-    forces[0] = 0;
-    forces[1] = 0;
-    forces[2] = 0;
-    torques[0] = 0;
-    torques[1] = 0;
-    torques[2] = 0;
+    vector[] = {0};
+    posicionInicial[] = {0};
+    posicionInicialEsferica[] = {0};
+    posicionInicialCartesiana[] = {0};
+    posicionPOI[] = {0};
+    posicionFinalEsferica[] = {0};
+    posicionFinal[] = {0};     
+    forces[] = {0};
+    torques[] = {0};
     
     api.setForces(forces);
     DEBUG(("Las forces son: %f ,%f ,%f \n", forces[0], forces[1], forces[2]));
